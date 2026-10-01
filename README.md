@@ -6,8 +6,17 @@ the next meeting announced directly in the clock label.
 This project started as a fork of
 [tmn73/omarchy-calendar](https://github.com/tmn73/omarchy-calendar), but has
 since evolved into a standalone plugin focused on simple calendar integration.
+Unlike the original, which supports Google Calendar, external event sources and
+event editing, this plugin is deliberately read-only and iCal-only: paste a
+subscription URL in the settings panel and the plugin handles the sync setup.
+There is no Google Cloud project, OAuth flow or terminal setup.
 
-![Calendar preview](docs/screenshots/calendar.png)
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/calendar.png" alt="Calendar preview"></td>
+    <td width="50%"><img src="docs/screenshots/settings.png" alt="Calendar settings"></td>
+  </tr>
+</table>
 
 ## Features
 
@@ -67,8 +76,6 @@ The calendar name is read from `X-WR-CALNAME` or `NAME` in the feed. Its color
 is read from `X-APPLE-CALENDAR-COLOR` or `COLOR`. If either value is missing,
 the hostname or a default color is used. The settings panel also lets you hide
 or remove calendars.
-
-![Calendar settings](docs/screenshots/settings.png)
 
 For Google Calendar, use **Settings > your calendar > Integrate calendar >
 Secret address in iCal format**. The same kind of subscription link works with
