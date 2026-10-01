@@ -22,6 +22,7 @@ There is no Google Cloud project, OAuth flow or terminal setup.
 
 - Month grid with ISO week numbers and coloured dots per calendar
 - Selected-day agenda and live next-event countdown
+- Click Google events to open them, or use **+** to create one on the selected day
 - Join button for events with a video link
 - Per-calendar visibility and automatic calendar names from iCal metadata
 - Week start, declined-event and working-location display settings

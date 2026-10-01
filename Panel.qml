@@ -234,6 +234,16 @@ Panel {
     root.openExternally(Model.eventUrlFor(event))
   }
 
+  function createEvent() {
+    var start = Model.keyForDate(root.selectedDate).replace(/-/g, "")
+    var followingDay = new Date(root.selectedDate.getFullYear(),
+                                root.selectedDate.getMonth(),
+                                root.selectedDate.getDate() + 1)
+    var end = Model.keyForDate(followingDay).replace(/-/g, "")
+    root.openExternally("https://calendar.google.com/calendar/r/eventedit?action=TEMPLATE&dates="
+                        + start + "%2F" + end)
+  }
+
   onHiddenCalendarsChanged: root.rebuildIndex()
   onShowWorkingLocationChanged: root.rebuildIndex()
   onHideDeclinedChanged: root.rebuildIndex()
@@ -1058,14 +1068,32 @@ Panel {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Style.space(4)
 
-            Text {
+            Item {
               width: parent.width
-              text: Qt.formatDate(root.selectedDate, "dddd d MMMM").toUpperCase()
-              color: Qt.darker(root.contentForeground, 1.4)
-              font.family: root.contentFontFamily
-              font.pixelSize: Style.font.caption
-              font.letterSpacing: 1
-              font.bold: true
+              height: Math.max(agendaLabel.implicitHeight, addEventButton.implicitHeight)
+
+              Text {
+                id: agendaLabel
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                text: Qt.formatDate(root.selectedDate, "dddd d MMMM").toUpperCase()
+                color: Qt.darker(root.contentForeground, 1.4)
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+                font.letterSpacing: 1
+                font.bold: true
+              }
+
+              PanelActionButton {
+                id: addEventButton
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                iconText: "+"
+                tooltipText: "Create event in Google Calendar"
+                foreground: root.contentForeground
+                fontFamily: root.contentFontFamily
+                onClicked: root.createEvent()
+              }
             }
 
             Repeater {

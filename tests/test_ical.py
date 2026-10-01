@@ -146,3 +146,36 @@ class TestIcalConfig(unittest.TestCase):
             with patch.object(cli, "run", return_value=0) as run:
                 self.assertEqual(cli.main(["--config", str(path)]), 0)
             self.assertIsInstance(run.call_args.args[0], ical.Ical)
+
+
+class TestGoogleEventUrl(unittest.TestCase):
+    def test_builds_link_from_google_feed_and_uid(self):
+        url = ical._google_event_url(
+            "abc123@google.com",
+            "https://calendar.google.com/calendar/ical/"
+            "user%40gmail.com/private-secret/basic.ics",
+        )
+        self.assertEqual(
+            url,
+            "https://calendar.google.com/calendar/event?eid="
+            "YWJjMTIzIHVzZXJAZ21haWwuY29t",
+        )
+        self.assertNotIn("private-secret", url)
+
+    def test_ignores_non_google_feeds(self):
+        self.assertEqual(
+            ical._google_event_url(
+                "abc123@google.com", "https://example.com/private.ics"
+            ),
+            "",
+        )
+
+    def test_does_not_guess_links_for_external_uids(self):
+        self.assertEqual(
+            ical._google_event_url(
+                "event@example.com",
+                "https://calendar.google.com/calendar/ical/"
+                "user%40gmail.com/private-secret/basic.ics",
+            ),
+            "",
+        )

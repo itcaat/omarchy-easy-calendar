@@ -1,10 +1,11 @@
 """Read private iCalendar feeds without exposing their URLs in output."""
 
+import base64
 import hashlib
 import re
 from datetime import datetime, timedelta
 from urllib.request import HTTPRedirectHandler, Request, build_opener
-from urllib.parse import urlsplit
+from urllib.parse import unquote, urlsplit
 from zoneinfo import ZoneInfo
 
 MAX_BYTES = 20 * 1024 * 1024
@@ -57,7 +58,29 @@ def endpoint(value, tz):
     return {"date": value.isoformat()}
 
 
-def parse(data, time_min, time_max, local_tz):
+def _google_event_url(uid, feed_url):
+    """Build the web link that Google omits from its iCal feeds."""
+    parsed = urlsplit(feed_url)
+    if parsed.hostname not in ("calendar.google.com", "www.google.com"):
+        return ""
+    parts = [part for part in parsed.path.split("/") if part]
+    try:
+        calendar_id = unquote(parts[parts.index("ical") + 1])
+    except (ValueError, IndexError):
+        return ""
+    suffix = "@google.com"
+    if not uid.endswith(suffix) or not calendar_id:
+        return ""
+    event_id = uid[:-len(suffix)]
+    if not event_id:
+        return ""
+    eid = base64.urlsafe_b64encode(
+        f"{event_id} {calendar_id}".encode()
+    ).decode().rstrip("=")
+    return f"https://calendar.google.com/calendar/event?eid={eid}"
+
+
+def parse(data, time_min, time_max, local_tz, feed_url=""):
     icalendar, recurring = dependencies()
     try:
         calendar = icalendar.Calendar.from_ical(data)
@@ -89,6 +112,7 @@ def parse(data, time_min, time_max, local_tz):
             uid = str(event.get("UID", ""))
             identity = event.decoded("RECURRENCE-ID", start)
             event_id = hashlib.sha256((uid + "|" + identity.isoformat()).encode()).hexdigest()
+            event_url = str(event.get("URL", "")).strip() or _google_event_url(uid, feed_url)
             result.append({
                 "id": event_id,
                 "iCalUID": uid,
@@ -96,7 +120,7 @@ def parse(data, time_min, time_max, local_tz):
                 "location": str(event.get("LOCATION", "")),
                 "start": endpoint(start, tz),
                 "end": endpoint(end, tz),
-                "htmlLink": str(event.get("URL", "")),
+                "htmlLink": event_url,
                 "hangoutLink": str(event.get("X-GOOGLE-CONFERENCE", "")),
             })
         return result
@@ -156,4 +180,4 @@ class Ical:
     def events(self, calendar_id, time_min, time_max):
         feed = next(feed for feed in self.feeds if feed["id"] == calendar_id)
         data = self._cache.pop(calendar_id, None) or self.fetch(feed["url"])
-        return parse(data, time_min, time_max, self.local_tz)
+        return parse(data, time_min, time_max, self.local_tz, feed["url"])
