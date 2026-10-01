@@ -129,6 +129,8 @@ Column {
         Text {
           width: parent.width
           text: toggle.label
+          // Calendar names can come from the remote iCal feed.
+          textFormat: Text.PlainText
           color: toggle.checked ? root.foreground : root.muted
           font.family: root.fontFamily
           font.pixelSize: Style.font.bodySmall
@@ -139,6 +141,7 @@ Column {
           width: parent.width
           visible: toggle.hint !== ""
           text: toggle.hint
+          textFormat: Text.PlainText
           color: root.faint
           font.family: root.fontFamily
           font.pixelSize: Style.font.caption
