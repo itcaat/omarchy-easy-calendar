@@ -30,7 +30,7 @@ def _unit_quote(value):
     return '"' + str(value).replace("\\", "\\\\").replace('"', '\\"').replace("%", "%%") + '"'
 
 
-def ensure_runtime():
+def ensure_runtime(add_url):
     """Install iCal dependencies and the timer on the first UI add."""
     venv = _venv_path()
     python = venv / "bin/python"
@@ -46,8 +46,13 @@ def ensure_runtime():
     if Path(sys.executable).resolve() != python.resolve():
         env = dict(os.environ)
         env["OMARCHY_CALENDAR_MANAGE_READY"] = "1"
-        subprocess.run([str(python), "-m", "omarchy_calendar_sync.manage_ical", *sys.argv[1:]],
-                       check=True, env=env)
+        subprocess.run(
+            [str(python), "-m", "omarchy_calendar_sync.manage_ical", *sys.argv[1:]],
+            check=True,
+            env=env,
+            input=add_url + "\n",
+            text=True,
+        )
         raise SystemExit(0)
 
     unit_dir = Path.home() / ".config/systemd/user"
@@ -82,14 +87,19 @@ def _save(path, raw):
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="omarchy-calendar-manage-ical")
     actions = parser.add_mutually_exclusive_group(required=True)
-    actions.add_argument("--add", metavar="URL")
+    actions.add_argument("--add", action="store_true",
+                         help="read the subscription URL from standard input")
     actions.add_argument("--remove", metavar="ID")
     parser.add_argument("--name", default="")
     parser.add_argument("--color", default=None)
     args = parser.parse_args(argv)
 
-    if args.add is not None:
-        ensure_runtime()
+    add_url = None
+    if args.add:
+        add_url = sys.stdin.readline().strip()
+        if not add_url:
+            raise ValueError("Subscription URL is required on standard input")
+        ensure_runtime(add_url)
 
     path = config.CONFIG_PATH
     raw = _read(path)
@@ -98,10 +108,10 @@ def main(argv=None):
     ical = raw.get("ical") if isinstance(raw.get("ical"), dict) else {}
     feeds = list(ical.get("feeds") or [])
 
-    if args.add is not None:
+    if args.add:
         feed = {
             "id": "ical-" + uuid.uuid4().hex,
-            "url": args.add.strip(),
+            "url": add_url,
         }
         if args.name.strip():
             feed["name"] = args.name.strip()

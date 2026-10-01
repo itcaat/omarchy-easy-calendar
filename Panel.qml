@@ -191,10 +191,14 @@ Panel {
   property string icalManagerAction: "add"
   property string icalManagerMessage: ""
   property var icalManagerArgs: []
+  // Subscription URLs are bearer secrets, so additions send them over stdin
+  // instead of making them visible in the process command line.
+  property string icalManagerInput: ""
 
-  function manageIcal(args) {
+  function manageIcal(args, input) {
     if (root.icalManagerBusy) return
     root.icalManagerArgs = args
+    root.icalManagerInput = input || ""
     root.icalManagerMessage = ""
     root.icalManagerBusy = true
     icalManager.running = true
@@ -202,7 +206,7 @@ Panel {
 
   function addIcal(url, color) {
     root.icalManagerAction = "add"
-    manageIcal([root.icalManagerPath, "--add", url, "--color", color])
+    manageIcal([root.icalManagerPath, "--add", "--color", color], url)
   }
 
   function removeIcal(calendarId) {
@@ -410,6 +414,12 @@ Panel {
   Process {
     id: icalManager
     command: root.icalManagerArgs
+    stdinEnabled: true
+    onStarted: {
+      if (root.icalManagerInput === "") return
+      icalManager.write(root.icalManagerInput + "\n")
+      root.icalManagerInput = ""
+    }
     onRunningChanged: {
       if (running) return
       root.icalManagerBusy = false
