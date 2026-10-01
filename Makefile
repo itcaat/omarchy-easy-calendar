@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-PLUGIN_ID := itcaat.calendar
+PLUGIN_ID := itcaat.easy-calendar
 PLUGIN_DIR := $(HOME)/.config/omarchy/plugins
 PLUGIN_LINK := $(PLUGIN_DIR)/$(PLUGIN_ID)
 

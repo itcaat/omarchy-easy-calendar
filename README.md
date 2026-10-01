@@ -37,7 +37,7 @@ source-management tool.
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/itcaat/omarchy-calendar.git --enable
+omarchy plugin add https://github.com/itcaat/omarchy-easy-calendar.git --enable
 ```
 
 This widget replaces the built-in clock. In
@@ -47,10 +47,10 @@ This widget replaces the built-in clock. In
 ```json
 {
   "bar": {
-    "centerAnchor": "itcaat.calendar",
+    "centerAnchor": "itcaat.easy-calendar",
     "layout": {
       "center": [
-        { "id": "itcaat.calendar", "format": "dddd HH:mm" }
+        { "id": "itcaat.easy-calendar", "format": "dddd HH:mm" }
       ]
     }
   }
@@ -61,6 +61,13 @@ Then reload the shell:
 
 ```bash
 omarchy restart shell
+```
+
+Upgrading from an earlier release? Replace `itcaat.calendar` with
+`itcaat.easy-calendar` in `shell.json`, then remove the old plugin entry:
+
+```bash
+omarchy plugin remove itcaat.calendar --yes
 ```
 
 ## Add calendars
@@ -96,30 +103,30 @@ make install
 The equivalent commands are:
 
 ```bash
-omarchy plugin validate /home/itcat/Work/itcaat/omarchy-calendar
+omarchy plugin validate /home/itcat/Work/itcaat/omarchy-easy-calendar
 mkdir -p ~/.config/omarchy/plugins
-ln -s /home/itcat/Work/itcaat/omarchy-calendar \
-  ~/.config/omarchy/plugins/itcaat.calendar
+ln -s /home/itcat/Work/itcaat/omarchy-easy-calendar \
+  ~/.config/omarchy/plugins/itcaat.easy-calendar
 omarchy-shell shell rescanPlugins
-omarchy plugin enable itcaat.calendar
+omarchy plugin enable itcaat.easy-calendar
 ```
 
 This removes the current installation, validates the checkout, creates the
 local symlink, rescans plugins, waits until Omarchy discovers it and enables
-`itcaat.calendar`. This makes it safe to use while iterating on the plugin.
+`itcaat.easy-calendar`. This makes it safe to use while iterating on the plugin.
 The individual steps are also available as `make validate`, `make link`,
 `make rescan`, `make enable` and `make remove`.
 
 Verify that local development is active with:
 
 ```bash
-readlink ~/.config/omarchy/plugins/itcaat.calendar
+readlink ~/.config/omarchy/plugins/itcaat.easy-calendar
 ```
 
 It should print the path to this checkout, not a copied directory.
 
-If `itcaat.calendar` is already installed as a copied plugin, remove that copy
-first with `omarchy plugin remove itcaat.calendar --yes`. Changes in the local
+If `itcaat.easy-calendar` is already installed as a copied plugin, remove that
+copy first with `omarchy plugin remove itcaat.easy-calendar --yes`. Changes in the local
 checkout are then picked up automatically; restart the shell if needed:
 
 ```bash
@@ -179,7 +186,7 @@ systemctl --user list-timers omarchy-calendar-sync.timer
 systemctl --user disable --now omarchy-calendar-sync.timer
 rm ~/.config/systemd/user/omarchy-calendar-sync.{service,timer}
 systemctl --user daemon-reload
-omarchy plugin remove itcaat.calendar
+omarchy plugin remove itcaat.easy-calendar
 ```
 
 For iCal, subscriptions remain in

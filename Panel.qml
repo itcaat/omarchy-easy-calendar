@@ -17,8 +17,8 @@ import "Model.js" as Model
 // anchor against.
 Panel {
   id: root
-  moduleName: "itcaat.calendar"
-  ipcTarget: "itcaat.calendar"
+  moduleName: "itcaat.easy-calendar"
+  ipcTarget: "itcaat.easy-calendar"
   manageIpc: false
 
   property var anchorItem: null
