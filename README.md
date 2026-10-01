@@ -3,7 +3,11 @@
 **Your iCal calendars in the Omarchy bar.** A month view with real events and
 the next meeting announced directly in the clock label.
 
-![Preview](preview.png)
+This project started as a fork of
+[tmn73/omarchy-calendar](https://github.com/tmn73/omarchy-calendar), but has
+since evolved into a standalone plugin focused on simple calendar integration.
+
+![Calendar preview](docs/screenshots/calendar.png)
 
 ## Features
 
@@ -63,6 +67,8 @@ The calendar name is read from `X-WR-CALNAME` or `NAME` in the feed. Its color
 is read from `X-APPLE-CALENDAR-COLOR` or `COLOR`. If either value is missing,
 the hostname or a default color is used. The settings panel also lets you hide
 or remove calendars.
+
+![Calendar settings](docs/screenshots/settings.png)
 
 For Google Calendar, use **Settings > your calendar > Integrate calendar >
 Secret address in iCal format**. The same kind of subscription link works with
